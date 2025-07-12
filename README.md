@@ -134,55 +134,6 @@ Once configured, you can use the tools directly in Claude Code:
 3. Create corresponding documentation in `claude-commands/`
 4. Update this README with the new functionality
 
-## API Reference
-
-### Tool Parameters
-
-#### generate-plan
-- `task` (string) - The task or feature to implement
-- `context` (string, optional) - Additional project context
-
-#### gemini-consult
-- `question` (string) - The question or problem
-- `currentContext` (string, optional) - Current work context
-
-#### analyze-codebase
-- `codebaseInfo` (string) - Codebase structure and files
-- `task` (string, optional) - Specific analysis goal
-
-#### strategic-plan
-- `feature` (string) - Feature to implement
-- `requirements` (string) - Detailed requirements
-- `codebaseContext` (string, optional) - Codebase constraints
-
-#### review-approach
-- `proposedApproach` (string) - Implementation approach to review
-- `context` (string, optional) - Additional context
-
-## Configuration
-
-The server uses the following Gemini models:
-- `gemini-2.5-pro` - For complex planning and analysis tasks
-- `gemini-2.5-flash` - For quick consultations and reviews
-
-Timeout is set to 10 minutes for complex operations.
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Gemini CLI not found**: Ensure Gemini CLI is installed and in PATH
-2. **Authentication errors**: Run `gemini auth login` to refresh credentials
-3. **Timeout errors**: Complex requests may exceed the 10-minute timeout
-4. **Permission errors**: Ensure proper file permissions for the project directory
-
-### Debugging
-
-Enable debug logging by setting environment variables:
-```bash
-DEBUG=gemini-mcp* pnpm dev
-```
-
 ## Contributing
 
 1. Fork the repository
@@ -193,13 +144,4 @@ DEBUG=gemini-mcp* pnpm dev
 
 ## License
 
-ISC License - see LICENSE file for details
-
-## Roadmap
-
-Planned enhancements:
-- Direct code generation and modification tools
-- Automated test generation
-- Code refactoring assistance
-- Enhanced error handling and debugging tools
-- Support for additional Gemini models and configurations
+MIT License - see LICENSE file for details

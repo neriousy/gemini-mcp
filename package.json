@@ -23,16 +23,16 @@
     "analysis",
     "code-review"
   ],
-  "author": "Your Name <your.email@example.com>",
-  "license": "ISC",
+  "author": "neriousy",
+  "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yourusername/gemini-mcp.git"
+    "url": "git+https://github.com/neriousy/gemini-mcp.git"
   },
   "bugs": {
-    "url": "https://github.com/yourusername/gemini-mcp/issues"
+    "url": "https://github.com/neriousy/gemini-mcp/issues"
   },
-  "homepage": "https://github.com/yourusername/gemini-mcp#readme",
+  "homepage": "https://github.com/neriousy/gemini-mcp#readme",
   "packageManager": "pnpm@10.11.0",
   "devDependencies": {
     "@types/node": "^24.0.13",
