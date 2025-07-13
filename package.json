@@ -5,7 +5,9 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc",
+    "build": "npm run generate-commands && tsc",
+    "prebuild": "npm run generate-commands",
+    "generate-commands": "tsx src/generateCommands.ts",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
     "clean": "rm -rf dist",

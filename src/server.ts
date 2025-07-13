@@ -1,6 +1,6 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
-import z from 'zod';
 import { geminiClient } from './gemini.js';
+import { getAllTools, buildParameterSchema } from './tools.js';
 
 export const server = new McpServer({
   name: 'gemini',
@@ -11,224 +11,115 @@ export const server = new McpServer({
   },
 });
 
-server.tool(
-  'generate-plan',
-  'Use Gemini to generate a detailed plan for Claude Code to implement a task',
-  {
-    task: z
-      .string()
-      .describe('The task or feature that needs to be implemented'),
-    context: z
-      .string()
-      .optional()
-      .describe(
-        'Additional context about the project, codebase, or requirements'
-      ),
-  },
-  async ({ task, context }) => {
-    try {
-      const plan = await geminiClient.generatePlan(task, context);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: plan,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error generating plan with Gemini: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`,
-          },
-        ],
-      };
+// Register all tools dynamically
+getAllTools().forEach((tool) => {
+  const parameterSchema = buildParameterSchema(tool);
+  
+  server.tool(
+    tool.name,
+    tool.description,
+    parameterSchema,
+    async (params) => {
+      try {
+        let response: string;
+        
+        // Route to appropriate gemini method based on tool name
+        switch (tool.name) {
+          case 'generate-plan':
+            response = await geminiClient.generatePlan(
+              params.task as string,
+              params.context as string | undefined
+            );
+            break;
+            
+          case 'gemini-consult':
+            response = await geminiClient.consult(
+              params.question as string,
+              params.currentContext as string | undefined
+            );
+            break;
+            
+          case 'analyze-codebase':
+            response = await geminiClient.analyzeCodebase(
+              params.codebaseInfo as string,
+              params.task as string | undefined
+            );
+            break;
+            
+          case 'strategic-plan':
+            response = await geminiClient.strategicPlan(
+              params.feature as string,
+              params.requirements as string,
+              params.codebaseContext as string | undefined
+            );
+            break;
+            
+          case 'review-approach':
+            response = await geminiClient.reviewApproach(
+              params.proposedApproach as string,
+              params.context as string | undefined
+            );
+            break;
+            
+          case 'generate-tests':
+            response = await geminiClient.generateTests(
+              params.description as string,
+              params.context as string | undefined
+            );
+            break;
+            
+          case 'generate-docs':
+            response = await geminiClient.generateDocs(
+              params.subject as string,
+              params.context as string | undefined
+            );
+            break;
+            
+          case 'debug-assist':
+            response = await geminiClient.debugAssist(
+              params.errorDescription as string,
+              params.context as string | undefined
+            );
+            break;
+            
+          case 'explain-concept':
+            response = await geminiClient.explainConcept(
+              params.concept as string,
+              params.context as string | undefined
+            );
+            break;
+            
+          case 'compare-technologies':
+            response = await geminiClient.compareTechnologies(
+              params.comparison as string,
+              params.useCase as string | undefined
+            );
+            break;
+            
+          default:
+            throw new Error(`Unknown tool: ${tool.name}`);
+        }
+        
+        return {
+          content: [
+            {
+              type: 'text',
+              text: response,
+            },
+          ],
+        };
+      } catch (error) {
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Error with Gemini ${tool.name}: ${
+                error instanceof Error ? error.message : 'Unknown error'
+              }`,
+            },
+          ],
+        };
+      }
     }
-  }
-);
-
-server.tool(
-  'gemini-consult',
-  'Consult with Gemini when Claude needs help, additional context, or is stuck on a problem',
-  {
-    question: z
-      .string()
-      .describe(
-        'The question, problem, or situation where Claude needs help or additional context'
-      ),
-    currentContext: z
-      .string()
-      .optional()
-      .describe(
-        'Current context about what Claude is working on, error messages, or relevant code'
-      ),
-  },
-  async ({ question, currentContext }) => {
-    try {
-      const consultPrompt = `Provide development guidance for this question:
-
-**Question**: ${question}
-
-${currentContext ? `**Current Context**: ${currentContext}\n` : ''}
-
-Please provide:
-- Practical advice and suggestions
-- Alternative approaches to consider  
-- Best practices and insights
-- Actionable next steps
-
-Focus on helpful, concrete guidance.`;
-
-      const response = await geminiClient.query(consultPrompt);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: response,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error consulting with Gemini: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`,
-          },
-        ],
-      };
-    }
-  }
-);
-
-server.tool(
-  'analyze-codebase',
-  'Analyze codebase structure and patterns to understand how it works before implementing changes',
-  {
-    codebaseInfo: z
-      .string()
-      .describe(
-        'Information about the codebase structure, files, and patterns'
-      ),
-    task: z
-      .string()
-      .optional()
-      .describe('Optional: specific task this analysis is for'),
-  },
-  async ({ codebaseInfo, task }) => {
-    try {
-      const analysis = await geminiClient.analyzeCodebase(codebaseInfo, task);
-      return {
-        content: [
-          {
-            type: 'text',
-            text: analysis,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error analyzing codebase with Gemini: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`,
-          },
-        ],
-      };
-    }
-  }
-);
-
-server.tool(
-  'strategic-plan',
-  'Create a high-level strategic roadmap for implementing complex features',
-  {
-    feature: z.string().describe('The feature or system to be implemented'),
-    requirements: z
-      .string()
-      .describe('Detailed requirements and specifications'),
-    codebaseContext: z
-      .string()
-      .optional()
-      .describe('Optional: relevant codebase context and constraints'),
-  },
-  async ({ feature, requirements, codebaseContext }) => {
-    try {
-      const strategy = await geminiClient.strategicPlan(
-        feature,
-        requirements,
-        codebaseContext
-      );
-      return {
-        content: [
-          {
-            type: 'text',
-            text: strategy,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error creating strategic plan with Gemini: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`,
-          },
-        ],
-      };
-    }
-  }
-);
-
-server.tool(
-  'review-approach',
-  'Review and validate a proposed implementation approach before coding begins',
-  {
-    proposedApproach: z
-      .string()
-      .describe('The implementation approach or plan to review'),
-    context: z
-      .string()
-      .optional()
-      .describe(
-        'Optional: additional context about the project or requirements'
-      ),
-  },
-  async ({ proposedApproach, context }) => {
-    try {
-      const review = await geminiClient.reviewApproach(
-        proposedApproach,
-        context
-      );
-      return {
-        content: [
-          {
-            type: 'text',
-            text: review,
-          },
-        ],
-      };
-    } catch (error) {
-      return {
-        content: [
-          {
-            type: 'text',
-            text: `Error reviewing approach with Gemini: ${
-              error instanceof Error ? error.message : 'Unknown error'
-            }`,
-          },
-        ],
-      };
-    }
-  }
-);
+  );
+});

@@ -3,7 +3,9 @@
     "allow": [
       "Bash(pnpm build:*)",
       "WebFetch(domain:docs.anthropic.com)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "mcp__gemini-mcp__strategic-plan",
+      "Bash(npm run generate-commands:*)"
     ],
     "deny": []
   }
