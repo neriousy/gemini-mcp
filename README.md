@@ -94,15 +94,16 @@ pnpm start
 
 Add this server to your Claude Code configuration:
 
-```json
-{
-  "mcpServers": {
-    "gemini": {
-      "command": "node",
-      "args": ["/path/to/gemini-mcp/dist/index.js"]
-    }
-  }
-}
+```bash
+claude mcp add gemini-mcp node /path/to/dist/index.js
+```
+
+### Adding custom commands 
+
+Copy the content of claude-commands to your .claude/commands folder
+
+```bash
+cp claude-commands/* ./claude/commands
 ```
 
 ### Using the Tools
