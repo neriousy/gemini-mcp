@@ -2,7 +2,7 @@
 
 A Model Context Protocol (MCP) server that integrates Google's Gemini AI with Claude Code for enhanced development workflows.
 
-<video src="https://github.com/user-attachments/assets/5aa59a83-0ce5-4a58-976f-1d717517bee9" controls/>
+<video src="https://github.com/user-attachments/assets/5aa59a83-0ce5-4a58-976f-1d717517bee9" controls> </video>
 
 ## Overview
 
